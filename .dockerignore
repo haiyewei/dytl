@@ -1,0 +1,12 @@
+.git
+target
+content
+temp
+dev
+
+config.yaml
+dytl
+
+*.log
+*.mp4
+*.ts

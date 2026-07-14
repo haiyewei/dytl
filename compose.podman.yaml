@@ -1,0 +1,6 @@
+services:
+  dytl:
+    userns_mode: keep-id
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro,Z
+      - ./content:/app/content:Z

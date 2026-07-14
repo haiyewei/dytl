@@ -1,0 +1,16 @@
+services:
+  dytl:
+    build:
+      context: .
+      args:
+        AMAGI_VERSION: v0.1.6
+        APP_UID: ${APP_UID:-1000}
+        APP_GID: ${APP_GID:-1000}
+    image: dytl:alpine
+    container_name: dytl
+    restart: unless-stopped
+    stop_signal: SIGINT
+    stop_grace_period: 2m
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./content:/app/content

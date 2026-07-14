@@ -1,0 +1,103 @@
+# 多平台直播工具箱配置文件
+# 复制此文件为 config.yaml 并填入你的实际值
+# 至少保留一个平台配置块；不使用的平台可以保留示例值并在 monitor.targets 中禁用
+
+# 抖音配置
+douyin:
+  # 使用抖音能力时必填；抖音 Cookie 字符串
+  # 示例：name=value; name2=value2
+  cookies: "your_cookies_here"
+
+# 快手配置
+kuaishou:
+  # 使用快手能力时建议填写；留空时不会向 amagi 传递 Cookie
+  # 示例：cookies: "name=value"
+  cookies: ""
+
+# Twitter/X 配置
+twitter:
+  # 使用 Twitter/X 能力时需要保留此配置块；公开直播通常可留空
+  # 遇到登录限制、风控或私密内容时再填写浏览器中的 Cookie
+  # 示例：cookies: "name=value"
+  cookies: ""
+
+# 日志落盘配置
+logging:
+  # 可选；持久记录关键成功事件，如数据保存、MP4 封装完成
+  success_log_path: "./content/logs/success.log"
+  # 可选；持久记录关键失败/告警事件，如封装失败、缓存清理失败
+  failure_log_path: "./content/logs/failure.log"
+
+# 时间显示配置
+time:
+  # 可选；CLI 时间戳和录制文件名使用的 UTC 偏移小时
+  # 可选值：-23 到 23；中国大陆常用 8
+  utc_offset_hours: 8
+
+# 统一监控系统配置
+monitor:
+  # 可选；监控轮询间隔时间（秒）
+  # 可选值：>= 10 的整数；未填或 < 10 时自动回退到 30
+  # 示例：30、60、120
+  poll_interval_sec: 60
+  # 可选；定时重启间隔（小时），用于长期运行时定期退出重登
+  # 可选值：正整数；未填、0 或负值表示禁用定时重启
+  # 示例：6、12、24
+  restart_interval_hours: 6
+  # 可选；自动巡航封装异常中断遗留的 temp_record_* 分片目录
+  auto_rescue:
+    # 是否启用服务巡航封装；默认 true
+    enabled: true
+    # 服务启动时是否先巡航一次；默认 true
+    on_startup: true
+    # 服务运行中巡航间隔分钟；默认 10
+    interval_minutes: 10
+    # 只处理最后修改时间超过该分钟数的临时目录，避免碰正在录制的目录；默认 5
+    min_age_minutes: 5
+  # 必填；待监控账号列表
+  # 可选值：YAML 数组，每个元素都是一个监控目标对象
+  targets:
+    # 抖音监控目标示例
+    - platform: douyin
+      # 必填；平台标识
+      # 可选值：douyin | dy | kuaishou | ks | twitter | x
+      # 必填；账号标识，含义由 platform 决定
+      # douyin -> sec_uid，例如 test_douyin_sec_uid
+      # kuaishou -> principal_id，例如 test_ks_account
+      # twitter -> screen_name，例如 test_screen_user；不要填写 @
+      account: "test_douyin_sec_uid"
+      # 可选；自定义显示名称
+      # 示例：测试账号、本地备注名
+      alias: "测试抖音账号"
+      # 可选；是否启用该目标监控
+      # 可选值：true | false；默认 true
+      enabled: true
+
+    # 快手监控目标示例
+    - platform: kuaishou
+      # 快手 principal_id；可以先用 `dytl kuaishou user <主页链接>` 验证
+      account: "test_ks_account"
+      alias: "测试快手账号"
+      # 可选；是否启用该目标监控
+      # 可选值：true | false；默认 true
+      enabled: false
+
+    # Twitter/X 监控目标示例
+    - platform: twitter
+      # Twitter/X screen_name；填写用户名本体，不带 @
+      # 监控会用 live-room-info 检测开播，开播后自动解析 broadcast_id 并录制最高画质 HLS
+      account: "test_screen_user"
+      alias: "测试推特账号"
+      enabled: false
+
+# 说明：
+# 1. monitor.targets[*].account 的含义由 platform 决定：
+#    douyin -> sec_uid
+#    kuaishou -> principal_id
+#    twitter -> screen_name，不带 @
+# 2. enabled = false 时，目标会保留在配置中，但不会参与监控
+# 3. logging 只记录关键审计事件，不会写入高频轮询状态
+# 4. time.utc_offset_hours 会影响终端日志时间和录制文件名中的日期时间
+# 5. Twitter/X 直播录制和回放下载默认解析 HLS master，并选择分辨率最高、同分辨率下码率最高的流
+# 6. Twitter/X 已结束回放可用 `dytl twitter download <broadcast_url/broadcast_id>` 下载到 content/twitter/download/
+# 7. Twitter/X 回放下载默认使用机器可用并行度的一半下载分片，可用 `--jobs N` 覆盖

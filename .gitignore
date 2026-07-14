@@ -1,0 +1,43 @@
+# Local secrets and config (never commit real cookies)
+config.yaml
+config.yaml.*
+!config.example.yaml
+
+# Local development fixtures / private tooling
+/dev/
+
+# Generated content and temporary files
+content/
+temp/
+temp_*/
+
+# Rust build
+/target/
+
+# Legacy frontend artifacts
+node_modules/
+dist/
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables
+.env
+.env.*
+
+# System
+.DS_Store
+Thumbs.db
+
+# Process managers
+.pm2/
